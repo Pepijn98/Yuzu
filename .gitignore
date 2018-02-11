@@ -1,0 +1,4 @@
+cmd/yuzu/config.json
+cmd/yuzu/yuzu
+cmd/yuzu/go_install
+.idea
