@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	// DebugMode for debug mode duhh
 	DebugMode = false
 )
 
