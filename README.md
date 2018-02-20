@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/KurozeroPB/Yuzu)](https://goreportcard.com/report/github.com/KurozeroPB/Yuzu)
+
 # Yuzu
 A discord bot made in Go using discordgo
 
