@@ -1,15 +1,10 @@
 package commands
 
 import (
-	"fmt"
 	"strings"
 	"yuzu"
-	//"yuzu/config"
 	"yuzu/functions"
-
-	//"github.com/CleverbotIO/go-cleverbot.io"
 	"github.com/Jeffail/gabs"
-	"yuzu/logger"
 )
 
 // Talk things
@@ -41,37 +36,10 @@ func (Talk) Process(ctx yuzu.Context) {
 
 	ctx.Session.ChannelTyping(ctx.Channel.ID)
 
-	/* For whenever program-o is down
-	s, e := cleverbot.New(config.Config.CleverbotUser, config.Config.CleverbotKey)
-	if e != nil {
-		functions.ReportError(ctx.Session, fmt.Sprintf("%s", e), "/commands/talk.go")
-		_, err := ctx.Say("An error occured:\n", e)
-		if err != nil {
-			return
-		}
-		return
-	}
-
-	reply, err := s.Ask(strings.Join(ctx.Args, " "))
-	if err != nil {
-		functions.ReportError(ctx.Session, fmt.Sprintf("%s", err), "/commands/talk.go")
-		_, e := ctx.Say("An error occured:\n", err)
-		if e != nil {
-			return
-		}
-		return
-	}
-
-	_, er := ctx.Say(reply)
-	if er != nil {
-		return
-	}
-	*/
-
 	url := "http://api.program-o.com/v2/chatbot/?bot_id=12&say=" + strings.Join(ctx.Args, " ") + "&convo_id=" + "YUZU-" + ctx.Message.Author.ID + "&format=json"
 	res, er := functions.GET(url)
 	if er != nil {
-		_, e := ctx.Say("Something went wrong while getting an image %s", er)
+		_, e := ctx.Error(er)
 		if e != nil {
 			return
 		}
@@ -80,7 +48,6 @@ func (Talk) Process(ctx yuzu.Context) {
 	if e != nil {
 		_, er := ctx.Error(e)
 		if er != nil {
-			logger.ERROR.L(fmt.Sprintf("%s", er))
 			return
 		}
 		return
@@ -93,7 +60,6 @@ func (Talk) Process(ctx yuzu.Context) {
 	if err != nil {
 		_, e := ctx.Error(err)
 		if e != nil {
-			logger.ERROR.L(fmt.Sprintf("%s", err))
 			return
 		}
 		return
