@@ -3,7 +3,6 @@ package yuzu
 import (
 	"fmt"
 	"math/rand"
-	"strconv"
 	"strings"
 	"time"
 	"yuzu/bot"
@@ -12,12 +11,15 @@ import (
 	"yuzu/logger"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/jonas747/dshardmanager"
+	"strconv"
 )
+
+var Manager *dshardmanager.Manager
 
 // Ready handles the READY event.
 func Ready(chunkMembers bool) func(*discordgo.Session, *discordgo.Ready) {
 	return func(s *discordgo.Session, r *discordgo.Ready) {
-		logger.BOOT.L("Logged in as: " + r.User.Username + "#" + r.User.Discriminator + " (" + r.User.ID + ")")
 		if chunkMembers {
 			for _, g := range r.Guilds {
 				if g.Large {
@@ -42,10 +44,7 @@ func Ready(chunkMembers bool) func(*discordgo.Session, *discordgo.Ready) {
 			}
 
 			var guildCount = strconv.Itoa(len(guilds))
-			var channelCount = strconv.Itoa(channels)
 			var userCount = strconv.Itoa(len(users))
-
-			logger.INFO.L("Guilds: " + guildCount + ", Channels: " + channelCount + ", ±Users: " + userCount)
 
 			// Initial status update
 			var games = make([]string, 0)
@@ -63,6 +62,15 @@ func Ready(chunkMembers bool) func(*discordgo.Session, *discordgo.Ready) {
 				logger.ERROR.L(e)
 			}
 		})
+
+		if s.ShardID == s.ShardCount-1 {
+			logger.BOOT.L(fmt.Sprintf(
+				"Logged in as: %s#%s (%s)",
+				r.User.Username,
+				r.User.Discriminator,
+				r.User.ID),
+			)
+		}
 	}
 }
 

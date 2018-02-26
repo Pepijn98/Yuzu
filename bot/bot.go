@@ -6,12 +6,14 @@ import (
 	"yuzu/logger"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/jonas747/dshardmanager"
+	"yuzu/config"
 )
 
 // Variables used for command line parameters
 var (
-	// BotID   string
-	Session *discordgo.Session
+	// Manager the shard manager
+	Manager *dshardmanager.Manager
 
 	// StartTime when the application starts
 	StartTime = time.Now()
@@ -20,48 +22,55 @@ var (
 // Connect to discord
 func Connect(token string) {
 	// Create a new Discord session using the provided bot token.
-	var err error
-	Session, err = discordgo.New("Bot " + token)
+	Manager = dshardmanager.New("Bot " + token)
+
+	shardCount, err := Manager.GetRecommendedCount()
 	if err != nil {
-		logger.ERROR.L(fmt.Sprintf("error creating Discord session, %s", err))
+		shardCount = 2
+		logger.ERROR.L(fmt.Sprintf("Failed getting recommended shard count, using static: %v", shardCount))
+	}
+	Manager.SetNumShards(shardCount)
+	Manager.Name = "Yuzu | 柚"
+	Manager.LogChannel = "417460849561698308"
+	Manager.StatusMessageChannel = config.StatusMsgChannel
+
+	Manager.SessionFunc = func(token string) (Session *discordgo.Session, err error) {
+		Session, err = discordgo.New(token)
+		if err != nil {
+			logger.ERROR.L("Failed to start a session")
+			return
+		}
+
+		Session.LogLevel = discordgo.LogWarning
+		Session.ShouldReconnectOnError = true
+		Session.SyncEvents = true
 		return
 	}
-	// Get the account information.
-	_, err = Session.User("@me")
-	if err != nil {
-		logger.ERROR.L(fmt.Sprintf("error obtaining account details, %s", err))
-	}
-	// Store the account ID for later use.
-	// BotID = u.ID
+
 	logger.BOOT.L("Bot connected")
 }
 
 // Start discord session
 func Start() {
 	// Open the websocket and begin listening.
-	err := Session.Open()
+	err := Manager.Start()
 	if err != nil {
 		logger.ERROR.L(fmt.Sprintf("error opening connection, %s", err))
 		return
 	}
-	Session.Lock()
-	Session.LogLevel = discordgo.LogError
-	Session.ShouldReconnectOnError = true
-	Session.Unlock()
-
 	return
 }
 
 // Stop discord session
 func Stop() {
-	err := Session.Close()
+	err := Manager.StopAll()
 	if err != nil {
-		logger.ERROR.L(fmt.Sprintf("error closing session, %s", err))
+		logger.ERROR.L(fmt.Sprintf("error closing sessions, %s", err))
 		return
 	}
 }
 
 // AddHandler adds the handler
 func AddHandler(handler interface{}) {
-	Session.AddHandler(handler)
+	Manager.AddHandler(handler)
 }

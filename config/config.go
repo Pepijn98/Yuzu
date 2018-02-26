@@ -14,6 +14,7 @@ import (
 var (
 	Token  string
 	Prefix string
+	StatusMsgChannel string
 )
 
 // Config all the config shiz
@@ -36,6 +37,8 @@ type configStruct struct {
 	ErrWebhookID          string `json:"errWebhookID"`
 	JoinLeaveWebhookToken string `json:"join_leaveWebhookToken"`
 	JoinLeaveWebhookID    string `json:"join_leaveWebhookID"`
+	StatusMessageChannel string `json:"statusMessageChannel"`
+	DevStatusMessageChannel string `json:"devStatusMessageChannel"`
 }
 
 // Configure reads from disk the config file, unmarshal's it into the Go struct.
@@ -62,12 +65,14 @@ func Configure() error {
 		logger.DebugMode = true
 		Token = Config.DevToken
 		Prefix = Config.DevPrefix
+		StatusMsgChannel = Config.DevStatusMessageChannel
 	} else if Config.Release == "prod" {
 		if Config.Token == "" || Config.Prefix == "" || Config.OwnerID == "" {
 			return errors.New("config requires the token, prefix and owner_id fields to be set")
 		}
 		Token = Config.Token
 		Prefix = Config.Prefix
+		StatusMsgChannel = Config.StatusMessageChannel
 	} else {
 		return errors.New("config requires the release field to be set to either 'dev' or 'prod'")
 	}

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+echo 'Installing go packages...'
+
+sleep 0.2
+
+if [ "$1" == "-u" ]; then
+    echo 'Getting KurozeroPB/go-weeb'
+    eval 'go get -u github.com/KurozeroPB/go-weeb'
+
+    echo 'Getting ajanicij/goduckgo/goduckgo'
+    eval 'go get -u github.com/ajanicij/goduckgo/goduckgo'
+
+    echo 'Getting bwmarrin/discordgo'
+    eval 'go get -u github.com/bwmarrin/discordgo'
+
+    echo 'Getting dustin/go-humanize'
+    eval 'go get -u github.com/dustin/go-humanize'
+
+    echo 'Getting robertkrimen/otto'
+    eval 'go get -u github.com/robertkrimen/otto'
+
+    echo 'Getting robertkrimen/otto/underscore'
+    eval 'go get -u github.com/robertkrimen/otto/underscore'
+
+    echo 'Getting robfig/cron'
+    eval 'go get -u github.com/robfig/cron'
+
+    echo 'Getting ttacon/chalk'
+    eval 'go get -u github.com/ttacon/chalk'
+
+    echo 'Getting jonas747/dshardmanager'
+    eval 'go get -u github.com/jonas747/dshardmanager'
+
+    echo 'Getting KurozeroPB/kitsu-go'
+    eval 'go get -u github.com/KurozeroPB/kitsu-go'
+
+    echo 'Getting jonas747/dutil'
+    eval 'go get -u github.com/jonas747/dutil'
+else
+    echo 'Getting KurozeroPB/go-weeb'
+    eval 'go get github.com/KurozeroPB/go-weeb'
+
+    echo 'Getting ajanicij/goduckgo/goduckgo'
+    eval 'go get github.com/ajanicij/goduckgo/goduckgo'
+
+    echo 'Getting bwmarrin/discordgo'
+    eval 'go get github.com/bwmarrin/discordgo'
+
+    echo 'Getting dustin/go-humanize'
+    eval 'go get github.com/dustin/go-humanize'
+
+    echo 'Getting robertkrimen/otto'
+    eval 'go get github.com/robertkrimen/otto'
+
+    echo 'Getting robertkrimen/otto/underscore'
+    eval 'go get github.com/robertkrimen/otto/underscore'
+
+    echo 'Getting robfig/cron'
+    eval 'go get github.com/robfig/cron'
+
+    echo 'Getting ttacon/chalk'
+    eval 'go get github.com/ttacon/chalk'
+
+    echo 'Getting jonas747/dshardmanager'
+    eval 'go get github.com/jonas747/dshardmanager'
+
+    echo 'Getting KurozeroPB/kitsu-go'
+    eval 'go get github.com/KurozeroPB/kitsu-go'
+
+    echo 'Getting jonas747/dutil'
+    eval 'go get github.com/jonas747/dutil'
+fi
+
+echo 'Done!'
