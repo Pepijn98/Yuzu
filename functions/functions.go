@@ -119,15 +119,6 @@ func PostGuildCount(s *discordgo.Session) {
 	if config.Config.Release == "dev" {
 		return
 	}
-	postDBotsOrg(s)
-	postDBotsPW(s)
-}
-
-func postDBotsOrg(s *discordgo.Session) {
-	if config.Config.DBotsOrgKey == "" {
-		logger.WARNING.L("No token provided for discordbots.org")
-		return
-	}
 	c := cron.New()
 	c.AddFunc("@every 15m", func() {
 		gCount, err := getCurrentDBotsOrgStats(s)
@@ -140,26 +131,37 @@ func postDBotsOrg(s *discordgo.Session) {
 		if gCount == guildCount {
 			return
 		}
-		url := "https://discordbots.org/api/bots/" + s.State.User.ID + "/stats"
-		postGuildCount := []byte(`{"server_count":"` + strconv.Itoa(guildCount) + `"}`)
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(postGuildCount))
-		req.Header.Set("Authorization", config.Config.DBotsOrgKey)
-		req.Header.Set("Content-Type", "application/json")
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			e := fmt.Sprintf("error sending server count, %s", err)
-			logger.ERROR.L(e)
-		}
-		defer resp.Body.Close()
-		if resp.Status != "200 OK" {
-			logger.ERROR.L("Error posting server count to discordbots.org\nStatus code: " + resp.Status)
-		} else {
-			logger.INFO.L("Success posting server count to discordbots.org\nStatus code: " + resp.Status)
-		}
+		postDBotsOrg(s)
+		postDBotsPW(s)
 	})
 	c.Start()
+}
+
+func postDBotsOrg(s *discordgo.Session) {
+	if config.Config.DBotsOrgKey == "" {
+		logger.WARNING.L("No token provided for discordbots.org")
+		return
+	}
+	guilds := s.State.Guilds
+	guildCount := len(guilds)
+	url := "https://discordbots.org/api/bots/" + s.State.User.ID + "/stats"
+	postGuildCount := []byte(`{"server_count":"` + strconv.Itoa(guildCount) + `"}`)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postGuildCount))
+	req.Header.Set("Authorization", config.Config.DBotsOrgKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		e := fmt.Sprintf("error sending server count, %s", err)
+		logger.ERROR.L(e)
+	}
+	defer resp.Body.Close()
+	if resp.Status != "200 OK" {
+		logger.ERROR.L("Error posting server count to discordbots.org\nStatus code: " + resp.Status)
+	} else {
+		logger.INFO.L("Success posting server count to discordbots.org\nStatus code: " + resp.Status)
+	}
 }
 
 func postDBotsPW(s *discordgo.Session) {
@@ -167,38 +169,26 @@ func postDBotsPW(s *discordgo.Session) {
 		logger.WARNING.L("No token provided for bots.discord.pw")
 		return
 	}
-	c := cron.New()
-	c.AddFunc("@every 15m", func() {
-		gCount, err := getCurrentDBotsOrgStats(s) // Can use getCurrentDBotsOrgStats() here too, both sites should have the same guild count anyway
-		if err != nil {
-			logger.ERROR.L(fmt.Sprintf("%s", err))
-			return
-		}
-		guilds := s.State.Guilds
-		guildCount := len(guilds)
-		if gCount == guildCount {
-			return
-		}
-		url := "https://bots.discord.pw/api/bots/" + s.State.User.ID + "/stats"
-		postGuildCount := []byte(`{"server_count":"` + strconv.Itoa(guildCount) + `"}`)
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(postGuildCount))
-		req.Header.Set("Authorization", config.Config.DBotsPWKey)
-		req.Header.Set("Content-Type", "application/json")
+	guilds := s.State.Guilds
+	guildCount := len(guilds)
+	url := "https://bots.discord.pw/api/bots/" + s.State.User.ID + "/stats"
+	postGuildCount := []byte(`{"server_count":"` + strconv.Itoa(guildCount) + `"}`)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(postGuildCount))
+	req.Header.Set("Authorization", config.Config.DBotsPWKey)
+	req.Header.Set("Content-Type", "application/json")
 
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			e := fmt.Sprintf("error sending server count, %s", err)
-			logger.ERROR.L(e)
-		}
-		defer resp.Body.Close()
-		if resp.Status != "200 OK" {
-			logger.ERROR.L("Error posting server count to bots.discord.pw\nStatus code: " + resp.Status)
-		} else {
-			logger.INFO.L("Success posting server count to bots.discord.pw\nStatus code: " + resp.Status)
-		}
-	})
-	c.Start()
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		e := fmt.Sprintf("error sending server count, %s", err)
+		logger.ERROR.L(e)
+	}
+	defer resp.Body.Close()
+	if resp.Status != "200 OK" {
+		logger.ERROR.L("Error posting server count to bots.discord.pw\nStatus code: " + resp.Status)
+	} else {
+		logger.INFO.L("Success posting server count to bots.discord.pw\nStatus code: " + resp.Status)
+	}
 }
 
 func getCurrentDBotsOrgStats(s *discordgo.Session) (int, error) {
@@ -273,7 +263,7 @@ func ReportError(s *discordgo.Session, msg string, filePath string) {
 			{
 				Color:       0xff0000,
 				Title:       "ERROR",
-				Description: "```glsl\n**"+ filePath + "\n\n" + msg + "```",
+				Description: "```glsl\n**" + filePath + "\n\n" + msg + "```",
 			},
 		},
 	}
